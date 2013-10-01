@@ -1,0 +1,6 @@
+name = Default Language Selector
+description = Force select French as the default Language
+package = Multilingual - Internationalization
+core = 7.x
+configure = admin/config/regional/language/configure/default
+files[] = default_language.module

@@ -1,0 +1,102 @@
+<?php
+/**
+ * @file default_language.module
+ * 
+ * Adds a language selector based on the suffix rather than the standard prefex. 
+ * Module is designed specifcally to work with VMC/MVC rules
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+function default_language_menu() {
+  // Manage languages
+  $items['admin/config/regional/language/configure/default'] = array(
+    'title' => 'Ideeclic Default Language',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('default_language_admin_form'),
+    'access arguments' => array('administer languages'),
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+
+  return $items;
+}
+
+/**
+ * The default language provider configuration form.
+ */
+function default_language_admin_form($form, &$form_state) {
+  $form['default_language_prefix'] = array(
+    '#title' => t('Language Code'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('default_language_prefix', 'fr'),
+    '#description' => t('Language code to use as default (if avaliable)'),
+  );
+
+  $form_state['redirect'] = 'admin/config/regional/language/configure';
+
+  return system_settings_form($form);
+}
+
+
+/**
+ * Implements hook_help().
+ */
+function default_language_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#default_language':
+      return t("When enabled this module will add French as a language selection option.");
+  }
+}
+  
+/**
+* Implements hook_language_negotiation_info().
+*/
+function default_language_language_negotiation_info() {
+ return array(
+    'default_languageuage_provider' => array(
+      'callbacks' => array(
+        'language' => 'default_language_language_getter',
+        //'switcher' => 'locale_language_switcher_url',
+        //'url_rewrite' => 'locale_language_url_rewrite_url',
+      ),
+      'file' => drupal_get_path('module', 'default_language') . '/default_language.inc',
+      'weight' => 10,
+      'types' => array(LANGUAGE_TYPE_URL),
+      'name' => t('Ideeclic Default Langugage (%lang)', array('%lang' => variable_get('default_language_prefix', 'fr'))),
+      'description' => t('Select a configurable value as the default Language'),
+      /*'cache' => 1,*/
+    ),
+  );
+}
+/*
+/**
+ * Perform alterations on language providers.
+ * hook_language_negotiation_info_alter
+ *
+ * @param $language_providers
+ *   Array of language provider definitions.
+ */
+/*function default_language_language_negotiation_info_alter(array &$language_providers) {
+  if (isset($language_providers['language-selection-page'])) {
+    $language_providers['language-selection-page']['callbacks']['switcher'] = 'default_language_language_switcher_url';
+    $language_providers['language-selection-page']['callbacks']['url_rewrite'] = 'default_language_url_rewriter';
+  }
+}*/
+
+
+/**
+ * Implements hook_language_switch_links_alter().
+ *
+ * Replaces links with pointers to translated versions of the content.
+ */
+/*
+function default_language_language_switch_links_alter(array &$links, $type, $path) {
+  foreach ($links as $langcode => &$link_info) {
+    if (function_exists('mvc_text_lang_filter_quick_process') && !empty($link_info['attributes']['title'])) {
+      $link_info['attributes']['title'] = mvc_text_lang_filter_quick_process($link_info['attributes']['title'], TRUE);
+    }
+  }
+}*/
+
